@@ -17,7 +17,7 @@ A full-stack simulation application demonstrating model-view-controller (MVC) ar
 
 The backend follows a modular design with the following key classes:
 
-![UML Class Diagram](docs/class-diagram.svg)
+[![UML Class Diagram](docs/class-diagram.svg)](docs/class-diagram.svg)
 
 ---
 
