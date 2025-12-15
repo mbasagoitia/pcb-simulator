@@ -15,9 +15,8 @@ A full-stack simulation application demonstrating model-view-controller (MVC) ar
 
 ## Simulator Problem Description
 
-![Simulator Description](docs/pcb-simulator-description.png)
-![Simulator Description](docs/pcb-simulator-description_2.png)
-
+[![Simulator Problem Description](docs/pcb-simulator-description.jpg)]
+[![Simulator Problem Description](docs/pcb-simulator-description_2.jpg)]
 
 ## Architecture and Design
 
