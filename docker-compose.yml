@@ -6,15 +6,16 @@ services:
     container_name: app-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: pcb_simulator
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ""
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - "${DB_PORT}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pcb_simulator"]
       interval: 5s
       retries: 5
 

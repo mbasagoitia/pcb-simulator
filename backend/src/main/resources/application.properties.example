@@ -1,0 +1,13 @@
+# Use JDBC URL to connect to Postgres
+spring.datasource.url=jdbc:postgresql://localhost:5432/pcb_simulator
+spring.datasource.username=postgres
+spring.datasource.password=
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=none
+
+spring.sql.init.mode=always
+spring.sql.init.schema-locations=classpath:schema.sql
+spring.sql.init.data-locations=classpath:data.sql
+
+spring.jpa.show-sql=false

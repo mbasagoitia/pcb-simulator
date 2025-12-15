@@ -37,30 +37,31 @@ You can start the full application (backend + frontend + database) with a single
 
 4. Run the script: `./start.sh`
 
-What the script does:
+## What the script does
 
-1. Backend configuration
-- Checks if backend/src/main/resources/application.properties exists
-- If not, copies application.properties.example → application.properties so Spring Boot knows how to connect to the database
+1. **Backend configuration**  
+   - Checks if `backend/src/main/resources/application.properties` exists.  
+   - If not, copies `application.properties.example → application.properties` so Spring Boot knows how to connect to the database.  
 
-2. Start Docker Postgres container
-- Runs the Postgres database in Docker, exposing the port defined in your docker-compose.yml
-- The schema.sql script automatically creates the necessary tables and the data.sql seeds the database
-- Postgres is running in Docker on localhost:5432.
+2. **Start Docker Postgres container**  
+   - Runs the Postgres database in Docker, exposing the port defined in `docker-compose.yml` (default: `5432`).  
+   - The database is automatically created on container startup.  
+   - Spring Boot will execute `schema.sql` and `data.sql` from `backend/src/main/resources` to create tables and seed initial data.  
+   - Postgres is running in Docker on `localhost:5432`.  
 
-3. Start the Spring Boot backend
-- Runs `mvn spring-boot:run` in the backend folder
+3. **Start the Spring Boot backend**  
+   - Runs `mvn spring-boot:run` in the `backend` folder.  
+   - Backend is accessible at: [http://localhost:8080](http://localhost:8080)  
 
-- Backend is accessible at: http://localhost:8080
-- Start the React frontend
-
-4. Installs dependencies (npm install)
-- Runs the development server (`npm run dev`) in the frontend folder
-- Frontend is accessible at: http://localhost:5173
+4. **Start the React frontend**  
+   - Installs dependencies (`npm install`) if needed.  
+   - Runs the development server (`npm run dev`) in the `frontend` folder.  
+   - Frontend is accessible at: [http://localhost:5173](http://localhost:5173)  
 
 ### Notes
 
-- All services start together and logs appear in your terminal
-- Press Ctrl + C to stop the frontend and backend processes
-- The Docker Postgres container will keep running; stop it with `docker compose down`
-- If you want a fresh database, you can remove the container and volume: `docker compose down -v`
+- All services start together, and logs appear in your terminal.  
+- Press **Ctrl + C** to stop the frontend and backend processes.  
+- The Docker Postgres container will keep running; stop it with:  
+  ```bash
+  docker compose down
