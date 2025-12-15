@@ -17,6 +17,8 @@ A full-stack simulation application demonstrating model-view-controller (MVC) ar
 
 The backend follows a modular MVC design with the following key classes (zoom in or download SVG to see details):
 
+*Note: Some related AssemblyStation subclasses are omitted for formatting purposes--see HandSolderAssembly for assembly stations that implement PCBCheckstation and ApplySolderPaste for assembly stations that do not.*
+
 [![UML Class Diagram](docs/class-diagram.svg)](docs/class-diagram.svg)
 
 ---
