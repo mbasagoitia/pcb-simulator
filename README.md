@@ -13,7 +13,7 @@ A full-stack simulation application demonstrating model-view-controller (MVC) ar
 
 ---
 
-## Architecture & Design
+## Architecture and Design
 
 The backend follows a modular MVC design with the following key classes (zoom in or download SVG to see details):
 
