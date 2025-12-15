@@ -1,0 +1,385 @@
+@startuml
+allowmixing
+top to bottom direction
+scale 1024 width
+
+' --------------------------
+' APPLICATION PACKAGE
+' --------------------------
+package "com.example.pcb" {
+  class SimulatorApplication {
+    +main(args : String[]) : void
+  }
+}
+
+' --------------------------
+' CONTROLLER
+' --------------------------
+package "com.example.pcb.controller" {
+  class SimulationController {
+    +getRun(id : Long) : RunDetailDto
+    +listRuns() : List
+    +runSimulation(req : RunRequestDto) : RunDetailDto
+  }
+}
+
+' --------------------------
+' FRONTEND (REACT VIEWS)
+' --------------------------
+package "com.example.pcb.frontend" {
+  component SimulationQueryView <<React View>>
+  component SimulationRunView <<React View>>
+  component SimulationReportView <<React View>>
+}
+
+' --------------------------
+' DTOs
+' --------------------------
+package "com.example.pcb.dto" {
+
+  class FailureCountDto {
+    +name : String
+    +count : int
+  }
+
+  class RunDetailDto {
+    +runId : long
+    +boardType : String
+    +pcbsRun : int
+    +totalSuccesses : int
+    +totalFailures : int
+  }
+
+  class RunRequestDto {
+    +boardType : String
+    +count : int
+  }
+
+  class SimulationRunSummaryDto {
+    +runId : long
+    +boardType : String
+    +pcbsRun : int
+  }
+}
+
+' --------------------------
+' ENGINE
+' --------------------------
+package "com.example.pcb.engine" {
+
+  class Simulation {
+    -failureCount : int
+    -successCount : int
+    -pcbDefectFailureCounts : Map
+    -stationFailureCounts : Map
+
+    +run(count : int) : SimulationResult
+    -simulateSinglePcb() : void
+    -initializeStations() : void
+    -resetState() : void
+    -buildResult(count : int) : SimulationResult
+  }
+
+  class SimulationEngine {
+    +runSimulation(pcbType : PcbType, failureRates : List, count : int) : SimulationResult
+  }
+
+  class AssemblyAttempt {
+    +assemble(pcb : PCB) : AttemptResult
+    -removePCB(pcb : PCB) : void
+  }
+}
+
+' --------------------------
+' ENGINE.OUTCOME
+' --------------------------
+package "com.example.pcb.engine.outcome" {
+
+  abstract class Outcome {
+    +handleOutcome() : void
+  }
+
+  abstract class Failure {
+    +handleOutcome() : void
+  }
+
+  class AttemptResult {
+    -success : boolean
+    -stationFailure : boolean
+
+    +success() : boolean
+    +stationFailure() : boolean
+    +failureStation() : Station
+    +equals(obj : Object) : boolean
+    +hashCode() : int
+    +toString() : String
+  }
+
+  class PCBDefectFailure {
+    +handleOutcome() : void
+  }
+
+  class StationFailure {
+    +handleOutcome() : void
+  }
+
+  class Success {
+    +handleOutcome() : void
+  }
+}
+
+' --------------------------
+' ENGINE.PCB
+' --------------------------
+package "com.example.pcb.engine.pcb" {
+
+  abstract class PCB {
+    #id : int
+    +getName() : String
+  }
+
+  class GatewayBoard {
+    -typeName : String
+    +getName() : String
+  }
+
+  class SensorBoard {
+    -typeName : String
+    +getName() : String
+  }
+
+  class TestBoard {
+    -typeName : String
+    +getName() : String
+  }
+
+  class PcbFactory {
+    +create(type : PcbType, rates : List) : PCB
+  }
+}
+
+' --------------------------
+' ENGINE.STATION
+' --------------------------
+package "com.example.pcb.engine.station" {
+
+  class Station {
+    +getName() : String
+  }
+
+  abstract class AssemblyStation {
+    #STATION_FAILURE_RATE : double
+
+    +checkForStationFailure() : boolean
+    +performAssembleStep() : Outcome
+  }
+
+  interface PCBCheckStation {
+    +checkForPCBDefects(rate : double) : boolean
+  }
+
+  class ApplySolderPaste {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class Cleaning {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class Depanelization {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class HandSolderAssembly {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class OpticalInspection {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class PlaceComponents {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class ReflowSolder {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class TestICTFlyingProbe {
+    +getName() : String
+    +performAssembleStep() : Outcome
+  }
+
+  class StationFactory {
+    +createDefaultStations(failureRateService : FailureRateService) : List
+  }
+}
+
+' --------------------------
+' MODEL
+' --------------------------
+package "com.example.pcb.model" {
+  class FailureRates {
+    -rates : Map
+    +rates() : Map
+    +equals(obj : Object) : boolean
+    +hashCode() : int
+    +toString() : String
+  }
+
+  class SimulationResult {
+	+boardType : String
+	+pcbsRun : int
+	+totalSuccesses : int
+	+totalFailures : int
+	+pcbDefectFailures : Map
+	+stationFailures : Map
+  }
+
+}
+
+' --------------------------
+' REPOSITORIES
+' --------------------------
+package "com.example.pcb.repository" {
+
+  interface FailureRateRepository {
+    +findByPcbTypeName(name : String) : List
+    +findByPcbType_NameAndStationName(type : String, station : String) : Optional
+  }
+
+  interface PcbTypeRepository {
+    +findByName(name : String) : Optional
+  }
+
+  interface SimulationRunRepository { }
+}
+
+' --------------------------
+' REPOSITORY ENTITIES
+' --------------------------
+package "com.example.pcb.repository.entity" {
+
+  class PcbType {
+    -id : Long
+    -name : String
+  }
+
+  class FailureRate {
+    -id : Long
+    -failureRate : double
+    -stationName : String
+  }
+
+  class SimulationRun {
+    -id : Long
+    +resultJson : String
+  }
+}
+
+' --------------------------
+' SERVICES
+' --------------------------
+package "com.example.pcb.service" {
+
+  class FailureRateService {
+    +getFailureRate(type : String, station : String) : double
+  }
+
+  class SimulationService {
+    -mapper : ObjectMapper
+
+    +getRun(id : Long) : RunDetailDto
+    +listRuns() : List
+    +runSimulation(req : RunRequestDto) : RunDetailDto
+    -mapToRunDetailDto(id : Long, result : SimulationResult) : RunDetailDto
+  }
+}
+
+' --------------------------
+' RELATIONSHIPS
+' --------------------------
+SimulationController --> SimulationService : service
+
+RunDetailDto o-- FailureCountDto : pcbDefectFailures
+RunDetailDto o-- FailureCountDto : stationFailures
+
+AssemblyAttempt o-- AssemblyStation : stations
+Simulation o-- AssemblyStation : stations
+Simulation o-- FailureRate : failureRates
+Simulation *-- PcbType
+Simulation *-- FailureRateService
+SimulationEngine *-- FailureRateService
+
+AttemptResult *-- Station : failureStation
+
+Failure --|> Outcome
+Outcome --> PCB : pcb
+Outcome --> Station : station
+
+PCBDefectFailure --|> Failure
+StationFailure --|> Failure
+Success --|> Outcome
+
+GatewayBoard "1" o-- "*" FailureRate
+GatewayBoard --|> PCB
+SensorBoard "1" o-- "*" FailureRate
+SensorBoard --|> PCB
+TestBoard "1" o-- "*" FailureRate
+TestBoard --|> PCB
+
+ApplySolderPaste --|> AssemblyStation
+Cleaning --|> AssemblyStation
+Depanelization --|> AssemblyStation
+HandSolderAssembly --|> AssemblyStation
+HandSolderAssembly ..|> PCBCheckStation
+OpticalInspection --|> AssemblyStation
+OpticalInspection ..|> PCBCheckStation
+PlaceComponents --|> AssemblyStation
+PlaceComponents ..|> PCBCheckStation
+ReflowSolder --|> AssemblyStation
+TestICTFlyingProbe --|> AssemblyStation
+TestICTFlyingProbe ..|> PCBCheckStation
+
+Station --> PCB : currentPCB
+
+FailureRate --> PcbType : many-to-one
+
+FailureRateService *-- FailureRateRepository
+SimulationService *-- SimulationEngine
+SimulationService *-- FailureRateRepository
+SimulationService *-- PcbTypeRepository
+SimulationService *-- SimulationRunRepository
+
+' --------------------------
+' FRONTEND-TO-BACKEND RELATIONSHIPS
+' --------------------------
+SimulationQueryView --> SimulationController : fetch data
+SimulationRunView --> SimulationController : submit simulation
+SimulationReportView --> SimulationController : fetch report
+
+' --------------------------
+' DATABASE
+' --------------------------
+database "SimulationDB" <<Database>>
+
+' --------------------------
+' DATABASE RELATIONSHIPS
+' --------------------------
+FailureRateRepository --> SimulationDB
+PcbTypeRepository --> SimulationDB
+SimulationRunRepository --> SimulationDB
+
+PcbType --> SimulationDB : table
+FailureRate --> SimulationDB : table
+SimulationRun --> SimulationDB : table
+
+@enduml
