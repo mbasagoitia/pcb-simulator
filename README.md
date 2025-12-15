@@ -47,13 +47,13 @@ What the script does:
 - Postgres is running in Docker on localhost:5432.
 
 3. Start the Spring Boot backend
-- Runs mvn spring-boot:run in the backend folder
+- Runs `mvn spring-boot:run` in the backend folder
 
 - Backend is accessible at: http://localhost:8080
 - Start the React frontend
 
 4. Installs dependencies (npm install)
-- Runs the development server (npm run dev) in the frontend folder
+- Runs the development server (`npm run dev`) in the frontend folder
 - Frontend is accessible at: http://localhost:5173
 
 ### Notes
