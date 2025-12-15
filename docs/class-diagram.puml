@@ -15,7 +15,7 @@ package "com.example.pcb" {
 ' --------------------------
 ' CONTROLLER
 ' --------------------------
-package "com.example.pcb.controller" {
+package "com.example.pcb.controller" #LightGreen {
   class SimulationController {
     +getRun(id : Long) : RunDetailDto
     +listRuns() : List
@@ -26,7 +26,7 @@ package "com.example.pcb.controller" {
 ' --------------------------
 ' FRONTEND (REACT VIEWS)
 ' --------------------------
-package "com.example.pcb.frontend" {
+package "com.example.pcb.frontend" #LightBlue {
   component SimulationQueryView <<React View>>
   component SimulationRunView <<React View>>
   component SimulationReportView <<React View>>
@@ -35,7 +35,7 @@ package "com.example.pcb.frontend" {
 ' --------------------------
 ' DTOs
 ' --------------------------
-package "com.example.pcb.dto" {
+package "com.example.pcb.dto" #Orange {
 
   class FailureCountDto {
     +name : String
@@ -65,7 +65,7 @@ package "com.example.pcb.dto" {
 ' --------------------------
 ' ENGINE
 ' --------------------------
-package "com.example.pcb.engine" {
+package "com.example.pcb.engine" #LightYellow {
 
   class Simulation {
     -failureCount : int
@@ -93,13 +93,13 @@ package "com.example.pcb.engine" {
 ' --------------------------
 ' ENGINE.OUTCOME
 ' --------------------------
-package "com.example.pcb.engine.outcome" {
+package "com.example.pcb.engine.outcome" #LightYellow {
 
-  abstract class Outcome {
+  abstract class Outcome <<abstract>> {
     +handleOutcome() : void
   }
 
-  abstract class Failure {
+  abstract class Failure <<abstract>> {
     +handleOutcome() : void
   }
 
@@ -131,9 +131,9 @@ package "com.example.pcb.engine.outcome" {
 ' --------------------------
 ' ENGINE.PCB
 ' --------------------------
-package "com.example.pcb.engine.pcb" {
+package "com.example.pcb.engine.pcb" #LightYellow {
 
-  abstract class PCB {
+  abstract class PCB <<abstract>> {
     #id : int
     +getName() : String
   }
@@ -161,13 +161,13 @@ package "com.example.pcb.engine.pcb" {
 ' --------------------------
 ' ENGINE.STATION
 ' --------------------------
-package "com.example.pcb.engine.station" {
+package "com.example.pcb.engine.station" #LightYellow {
 
   class Station {
     +getName() : String
   }
 
-  abstract class AssemblyStation {
+  abstract class AssemblyStation <<abstract>> {
     #STATION_FAILURE_RATE : double
 
     +checkForStationFailure() : boolean
@@ -183,37 +183,7 @@ package "com.example.pcb.engine.station" {
     +performAssembleStep() : Outcome
   }
 
-  class Cleaning {
-    +getName() : String
-    +performAssembleStep() : Outcome
-  }
-
-  class Depanelization {
-    +getName() : String
-    +performAssembleStep() : Outcome
-  }
-
   class HandSolderAssembly {
-    +getName() : String
-    +performAssembleStep() : Outcome
-  }
-
-  class OpticalInspection {
-    +getName() : String
-    +performAssembleStep() : Outcome
-  }
-
-  class PlaceComponents {
-    +getName() : String
-    +performAssembleStep() : Outcome
-  }
-
-  class ReflowSolder {
-    +getName() : String
-    +performAssembleStep() : Outcome
-  }
-
-  class TestICTFlyingProbe {
     +getName() : String
     +performAssembleStep() : Outcome
   }
@@ -226,7 +196,7 @@ package "com.example.pcb.engine.station" {
 ' --------------------------
 ' MODEL
 ' --------------------------
-package "com.example.pcb.model" {
+package "com.example.pcb.model" #Orange {
   class FailureRates {
     -rates : Map
     +rates() : Map
@@ -249,7 +219,7 @@ package "com.example.pcb.model" {
 ' --------------------------
 ' REPOSITORIES
 ' --------------------------
-package "com.example.pcb.repository" {
+package "com.example.pcb.repository" #LightPink {
 
   interface FailureRateRepository {
     +findByPcbTypeName(name : String) : List
@@ -266,7 +236,7 @@ package "com.example.pcb.repository" {
 ' --------------------------
 ' REPOSITORY ENTITIES
 ' --------------------------
-package "com.example.pcb.repository.entity" {
+package "com.example.pcb.repository.entity" #LightPink {
 
   class PcbType {
     -id : Long
@@ -288,7 +258,7 @@ package "com.example.pcb.repository.entity" {
 ' --------------------------
 ' SERVICES
 ' --------------------------
-package "com.example.pcb.service" {
+package "com.example.pcb.service" #LightGreen {
 
   class FailureRateService {
     +getFailureRate(type : String, station : String) : double
@@ -309,47 +279,44 @@ package "com.example.pcb.service" {
 ' --------------------------
 SimulationController --> SimulationService : service
 
-RunDetailDto o-- FailureCountDto : pcbDefectFailures
-RunDetailDto o-- FailureCountDto : stationFailures
+SimulationController ..> RunRequestDto : accepts
+SimulationController ..> RunDetailDto : returns
 
-AssemblyAttempt o-- AssemblyStation : stations
-Simulation o-- AssemblyStation : stations
-Simulation o-- FailureRate : failureRates
+SimulationService ..> RunRequestDto : accepts
+SimulationService ..> RunDetailDto : returns
+SimulationService ..> SimulationRunSummaryDto : returns
+
+RunDetailDto o-- "0..*" FailureCountDto : pcbDefectFailures
+RunDetailDto o-- "0..*" FailureCountDto : stationFailures
+
+AssemblyAttempt o-- "1..*" AssemblyStation : stations
+Simulation o-- "1..*" AssemblyStation : stations
+Simulation o-- "0..*" FailureRate : failureRates
 Simulation *-- PcbType
 Simulation *-- FailureRateService
 SimulationEngine *-- FailureRateService
 
-AttemptResult *-- Station : failureStation
+AttemptResult *-- "0..1" Station : failureStation
 
 Failure --|> Outcome
 Outcome --> PCB : pcb
-Outcome --> Station : station
+Outcome --> "0..1" Station : station
 
 PCBDefectFailure --|> Failure
 StationFailure --|> Failure
 Success --|> Outcome
 
-GatewayBoard "1" o-- "*" FailureRate
+GatewayBoard "1" o-- "0..*" FailureRate
 GatewayBoard --|> PCB
-SensorBoard "1" o-- "*" FailureRate
+SensorBoard "1" o-- "0..*" FailureRate
 SensorBoard --|> PCB
-TestBoard "1" o-- "*" FailureRate
+TestBoard "1" o-- "0..*" FailureRate
 TestBoard --|> PCB
 
 ApplySolderPaste --|> AssemblyStation
-Cleaning --|> AssemblyStation
-Depanelization --|> AssemblyStation
-HandSolderAssembly --|> AssemblyStation
 HandSolderAssembly ..|> PCBCheckStation
-OpticalInspection --|> AssemblyStation
-OpticalInspection ..|> PCBCheckStation
-PlaceComponents --|> AssemblyStation
-PlaceComponents ..|> PCBCheckStation
-ReflowSolder --|> AssemblyStation
-TestICTFlyingProbe --|> AssemblyStation
-TestICTFlyingProbe ..|> PCBCheckStation
 
-Station --> PCB : currentPCB
+Station --> "0..1" PCB : currentPCB
 
 FailureRate --> PcbType : many-to-one
 
@@ -369,7 +336,7 @@ SimulationReportView --> SimulationController : fetch report
 ' --------------------------
 ' DATABASE
 ' --------------------------
-database "SimulationDB" <<Database>>
+database "SimulationDB" <<Database>> #LightPink
 
 ' --------------------------
 ' DATABASE RELATIONSHIPS
@@ -381,5 +348,23 @@ SimulationRunRepository --> SimulationDB
 PcbType --> SimulationDB : table
 FailureRate --> SimulationDB : table
 SimulationRun --> SimulationDB : table
+
+' --------------------------
+' MODEL CONNECTIONS
+' --------------------------
+SimulationEngine ..> SimulationResult : produces
+SimulationService ..> SimulationResult : uses for mapping
+SimulationService ..> RunDetailDto : maps to
+
+SimulationEngine ..> "com.example.pcb.engine.pcb.PcbFactory" : uses to create PCBs
+"com.example.pcb.engine.pcb.PcbFactory" ..> PCB : creates
+"com.example.pcb.engine.pcb.PcbFactory" ..> GatewayBoard
+"com.example.pcb.engine.pcb.PcbFactory" ..> SensorBoard
+"com.example.pcb.engine.pcb.PcbFactory" ..> TestBoard
+
+SimulationEngine ..> "com.example.pcb.engine.station.StationFactory" : uses to create stations
+"com.example.pcb.engine.station.StationFactory" ..> AssemblyStation : creates
+"com.example.pcb.engine.station.StationFactory" ..> ApplySolderPaste
+"com.example.pcb.engine.station.StationFactory" ..> HandSolderAssembly
 
 @enduml
