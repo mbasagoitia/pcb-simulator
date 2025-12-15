@@ -1,0 +1,5 @@
+# Spring Boot datasource configuration (local dev)
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/pcb_simulator
+spring.datasource.username=postgres
+spring.datasource.password=
