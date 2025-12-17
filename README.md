@@ -42,6 +42,8 @@ You can start the full application (backend + frontend + database) with a single
 
 4. Run the script: `./start.sh`
 
+5. Open `http://localhost:5173` in the browser
+
 ## What the script does
 
 1. **Backend configuration**  
